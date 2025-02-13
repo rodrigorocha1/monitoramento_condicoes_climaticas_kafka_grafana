@@ -2,6 +2,7 @@ from src.servico.kafka_produtor_clima import KafkaProdutorClima
 from dotenv import load_dotenv
 from src.servico.iservicotempo import IservicoTempo
 from time import sleep
+from src.servico.openweater import OpenWeater
 import os
 load_dotenv()
 
@@ -9,7 +10,7 @@ load_dotenv()
 class Produtor:
     def __init__(self, servico_tempo: IservicoTempo):
         self.__kafka_produtor = KafkaProdutorClima(
-            bootstrap_servers=''
+            bootstrap_servers='kafka:9092'
         )
 
         self.__servico_tempo = servico_tempo
@@ -39,6 +40,7 @@ class Produtor:
         )
         numero_particoes = self.__kafka_produtor.verificar_particoes(
             topico=self.__topico)
+        print(f'Numero de partições: {numero_particoes}')
 
         while True:
             for particao, cidade in enumerate(self.__cidades):
@@ -52,3 +54,8 @@ class Produtor:
                     particao=particao
                 )
                 sleep(os.environ['TEMPO_ESPERA'])
+
+
+if __name__ == '__main__':
+    p = Produtor(servico_tempo=OpenWeater())
+    p.rodar_produtor()

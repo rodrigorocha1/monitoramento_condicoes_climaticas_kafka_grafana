@@ -2,13 +2,13 @@ import os
 from src.servico.kafka_consumidor_clima import KafkaConsumidorClima
 
 
-class KafkaConsumidorClima:
+class Consumidor:
 
     def __init__(self):
         self.__kafka_consumer = KafkaConsumidorClima(
-            bootstrap_servers='localhost:9092',
+            bootstrap_servers='kafka:9092',
             group_id='weather_grupo',
-            topico='topico_teste'
+            topico='cidade'
         )
 
     def gerar_mensagens(self):
@@ -22,3 +22,8 @@ class KafkaConsumidorClima:
             print(f"Data/Hora: {dados['data_hora_atual']}")
 
             print('=' * 20)
+
+
+if __name__ == '__main__':
+    c = Consumidor()
+    c.gerar_mensagens()
