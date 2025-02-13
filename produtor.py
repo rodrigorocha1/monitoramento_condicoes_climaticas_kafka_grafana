@@ -39,7 +39,7 @@ class Produtor:
             numero_particoes=total_particoes
         )
         numero_particoes = self.__kafka_produtor.verificar_particoes(
-            topico=self.__topico)
+            topico=topico)
         print(f'Numero de partições: {numero_particoes}')
 
         while True:

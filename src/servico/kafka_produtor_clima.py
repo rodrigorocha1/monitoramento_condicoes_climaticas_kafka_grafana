@@ -2,7 +2,8 @@ import json
 from typing import Dict
 from kafka import KafkaProducer, KafkaAdminClient
 from kafka.admin import NewTopic
-from kafka.errors import TopicAlreadyExistsError
+from kafka.errors import TopicAlreadyExistsError, KafkaError
+import time
 
 
 class KafkaProdutorClima:
@@ -12,14 +13,24 @@ class KafkaProdutorClima:
         Args:
             bootstrap_servers (str): url do kafka
         """
-        self.__produtor = KafkaProducer(
-            bootstrap_servers=bootstrap_servers,
-            value_serializer=lambda v: json.dumps(v).encode('utf-8'),
-            key_serializer=lambda k: k.encode('utf-8')
-        )
-        self.__admin_cliente = KafkaAdminClient(
-            bootstrap_servers=bootstrap_servers)
-        print(self.__admin_cliente)
+        for i in range(6):
+            try:
+                self.__produtor = KafkaProducer(
+                    bootstrap_servers=bootstrap_servers,
+                    value_serializer=lambda v: json.dumps(v).encode('utf-8'),
+                    key_serializer=lambda k: k.encode('utf-8')
+                )
+                self.__admin_cliente = KafkaAdminClient(
+                    bootstrap_servers=bootstrap_servers)
+                print(self.__admin_cliente)
+                print('Kafka conectado')
+                break
+            except KafkaError as e:
+                print(f"Tentativa {i + 1}/5 falhou: {e}")
+                time.sleep(5)
+        else:
+            raise RuntimeError(
+                "Falha ao conectar ao Kafka após várias tentativas.")
 
     def criar_topico(self, topico: str, numero_particoes: int) -> None:
         """Método para criar tótico

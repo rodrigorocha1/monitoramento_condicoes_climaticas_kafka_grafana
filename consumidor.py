@@ -6,7 +6,7 @@ class Consumidor:
 
     def __init__(self):
         self.__kafka_consumer = KafkaConsumidorClima(
-            bootstrap_servers='kafka:9092',
+            bootstrap_servers='172.18.0.3:9092',
             group_id='weather_grupo',
             topico='cidade'
         )

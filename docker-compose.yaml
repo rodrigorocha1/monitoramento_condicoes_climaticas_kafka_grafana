@@ -63,21 +63,23 @@ services:
       dockerfile: Dockerfile.produtor
     depends_on:
       - kafka
-      - influxdb
+      - zookeeper
+      # - influxdb
     environment:
       - TZ=America/Sao_Paulo  # Ajuste do fuso horário
 
 
-  consumer:
-    container_name: consumidor
-    build:
-      context: .
-      dockerfile: Dockerfile.consumidor
-    depends_on:
-      - kafka
-      - influxdb
-    environment:
-      - TZ=America/Sao_Paulo  # Ajuste do fuso horário
+  # consumer:
+  #   container_name: consumidor
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile.consumidor
+  #   depends_on:
+  #     - kafka
+  #     - zookeeper
+  #     # - influxdb
+  #   environment:
+  #     - TZ=America/Sao_Paulo  # Ajuste do fuso horário
 
 
   grafana:
