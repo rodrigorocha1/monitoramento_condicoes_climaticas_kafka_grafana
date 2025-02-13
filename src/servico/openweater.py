@@ -2,11 +2,11 @@ import os
 from dotenv import load_dotenv
 import requests
 from typing import Dict, Any
-
+from src.servico.iservicotempo import IservicoTempo
 load_dotenv()
 
 
-class OpenWeater:
+class OpenWeater(IservicoTempo):
 
     def __init__(self) -> None:
         self.__url = os.environ['URL_OPENWEATHER']
