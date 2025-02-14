@@ -20,7 +20,7 @@ class Consumidor:
         self.__kafka_consumer = KafkaConsumidorClima(
             bootstrap_servers='kafka:9092',
             group_id='weather_grupo',
-            topico='cidade'
+            topico='tempo_cidades'
         )
 
     def gerar_mensagens(self):
