@@ -4,13 +4,14 @@ from src.servico.iservicotempo import IservicoTempo
 from time import sleep
 from src.servico.openweater import OpenWeater
 import os
+import time
 load_dotenv()
 
 
 class Produtor:
     def __init__(self, servico_tempo: IservicoTempo):
         self.__kafka_produtor = KafkaProdutorClima(
-            bootstrap_servers='172.18.0.3:9092'
+            bootstrap_servers='kafka:9092'
         )
 
         self.__servico_tempo = servico_tempo
@@ -33,11 +34,12 @@ class Produtor:
 
     def rodar_produtor(self):
         total_particoes = len(self.__cidades)
-        topico = 'cidade'
+        topico = 'tempo_cidades'
         self.__kafka_produtor.criar_topico(
             topico=topico,
             numero_particoes=total_particoes
         )
+        time.sleep(10)
         numero_particoes = self.__kafka_produtor.verificar_particoes(
             topico=topico)
         print(f'Numero de partições: {numero_particoes}')

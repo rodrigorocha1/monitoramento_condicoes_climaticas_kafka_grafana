@@ -28,6 +28,7 @@ class KafkaProdutorClima:
             except KafkaError as e:
                 print(f"Tentativa {i + 1}/5 falhou: {e}")
                 time.sleep(5)
+
         else:
             raise RuntimeError(
                 "Falha ao conectar ao Kafka após várias tentativas.")
@@ -46,8 +47,13 @@ class KafkaProdutorClima:
                 replication_factor=1
             )
             self.__admin_cliente.create_topics([novo_topico])
+            print(
+                f"Tópico '{topico}' criado com {numero_particoes} partições."
+            )
         except TopicAlreadyExistsError:
-            return
+            print(f"Tópico '{topico}' já existe.")
+        except Exception as e:
+            print(f"Erro ao criar tópico '{topico}': {e}")
 
     def verificar_particoes(self, topico: str) -> int:
         """Método para verificar o total de partições

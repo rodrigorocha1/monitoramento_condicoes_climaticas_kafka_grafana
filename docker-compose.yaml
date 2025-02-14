@@ -1,6 +1,22 @@
+
 services:
+  zookeeper:
+    image: bitnami/zookeeper:latest
+    container_name: zookeeper
+    ports:
+      - 2181:2181
+    environment:
+      - ALLOW_ANONYMOUS_LOGIN=yes
+      - TZ=America/Sao_Paulo
+    healthcheck:
+      test: [ "CMD", "echo", "ruok", "|", "nc", "localhost", "2181" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
   kafka:
     image: bitnami/kafka:latest
+    container_name: kafka
     restart: on-failure
     ports:
       - 9092:9092
@@ -11,24 +27,19 @@ services:
       - KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper:2181
       - KAFKA_CFG_NUM_PARTITIONS=3
       - ALLOW_PLAINTEXT_LISTENER=yes
-      - TZ=America/Sao_Paulo  # Ajuste do fuso horário
+      - TZ=America/Sao_Paulo
     depends_on:
-      - zookeeper
-
-  zookeeper:
-    image: bitnami/zookeeper:latest
-    ports:
-      - 2181:2181
-    environment:
-      - ALLOW_ANONYMOUS_LOGIN=yes
-      - TZ=America/Sao_Paulo  # Ajuste do fuso horário
+      zookeeper:
+        condition: service_healthy
+    healthcheck:
+      test: [ "CMD", "kafka-topics.sh", "--bootstrap-server", "localhost:9092", "--list" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   kafka-ui:
     image: provectuslabs/kafka-ui
     container_name: kafka-ui
-    depends_on:
-      - kafka
-      - zookeeper
     ports:
       - "8080:8080"
     restart: always
@@ -36,7 +47,12 @@ services:
       - KAFKA_CLUSTERS_0_NAME=kafka_grafana
       - KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS=kafka:9092
       - KAFKA_CLUSTERS_0_ZOOKEEPER=zookeeper:2181
-      - TZ=America/Sao_Paulo  # Ajuste do fuso horário
+      - TZ=America/Sao_Paulo
+    depends_on:
+      kafka:
+        condition: service_healthy
+      zookeeper:
+        condition: service_healthy
 
   influxdb:
     image: influxdb:2
@@ -44,7 +60,7 @@ services:
     ports:
       - "8086:8086"
     volumes:
-      - ./influxdb2-data:/var/lib/influxdb2
+      - influxdb_data:/var/lib/influxdb2
       - ./influxdb2-config:/etc/influxdb2
     environment:
       - DOCKER_INFLUXDB_INIT_MODE=setup
@@ -53,35 +69,40 @@ services:
       - DOCKER_INFLUXDB_INIT_ORG=rodr
       - DOCKER_INFLUXDB_INIT_BUCKET=rodr
     depends_on:
-      - kafka
-      - zookeeper
-      - grafana
+      kafka:
+        condition: service_healthy
+      zookeeper:
+        condition: service_healthy
 
   producer:
     container_name: produtor
     build:
       context: .
       dockerfile: Dockerfile.produtor
-    depends_on:
-      - kafka
-      - zookeeper
-      - influxdb
     environment:
-      - TZ=America/Sao_Paulo  # Ajuste do fuso horário
-
+      - TZ=America/Sao_Paulo
+    depends_on:
+      kafka:
+        condition: service_healthy
+      zookeeper:
+        condition: service_healthy
+      influxdb:
+        condition: service_started
 
   consumer:
     container_name: consumidor
     build:
       context: .
       dockerfile: Dockerfile.consumidor
-    depends_on:
-      - kafka
-      - zookeeper
-      - influxdb
     environment:
-      - TZ=America/Sao_Paulo  # Ajuste do fuso horário
-
+      - TZ=America/Sao_Paulo
+    depends_on:
+      kafka:
+        condition: service_healthy
+      zookeeper:
+        condition: service_healthy
+      influxdb:
+        condition: service_started
 
   grafana:
     image: grafana/grafana:latest
@@ -92,14 +113,14 @@ services:
     environment:
       - GF_SECURITY_ADMIN_USER=admin
       - GF_SECURITY_ADMIN_PASSWORD=admin
-      - TZ=America/Sao_Paulo  # Ajuste do fuso horário
-
+      - TZ=America/Sao_Paulo
     volumes:
-      - ./grafana_data:/var/lib/grafana
+      - grafana_data:/var/lib/grafana
     depends_on:
-      - kafka-ui
-      - zookeeper
-
+      kafka-ui:
+        condition: service_started
+      zookeeper:
+        condition: service_healthy
 
 volumes:
   grafana_data:
