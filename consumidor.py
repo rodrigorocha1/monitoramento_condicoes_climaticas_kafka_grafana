@@ -17,6 +17,10 @@ class Consumidor:
         self.__INFLUXDB_TOKEN = os.environ['INFLUXDB_TOKEN']
         self.__INFLUXDB_ORG = os.environ['INFLUXDB_ORG']
         self.__INFLUXDB_BUCKET = os.environ['INFLUXDB_BUCKET']
+        print(self.__INFLUXDB_URL)
+        print(self.__INFLUXDB_TOKEN)
+        print(self.__INFLUXDB_ORG)
+        print(self.__INFLUXDB_BUCKET)
         self.__cliente = InfluxDBClient(
             url=self.__INFLUXDB_URL,
             token=self.__INFLUXDB_TOKEN,
