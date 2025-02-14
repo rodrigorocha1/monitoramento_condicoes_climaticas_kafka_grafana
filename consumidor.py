@@ -1,7 +1,9 @@
+from typing import Dict
 from influxdb_client import InfluxDBClient, Point
 from influxdb_client.client.write_api import SYNCHRONOUS
 from src.servico.kafka_consumidor_clima import KafkaConsumidorClima
 from dotenv import load_dotenv
+from datetime import datetime
 import os
 from dateutil import parser
 load_dotenv()
@@ -33,22 +35,60 @@ class Consumidor:
         except Exception as e:
             print(f"Falha na conexão com o InfluxDB: {e}")
 
+    def __converter_data(self, data_hora: str) -> int:
+        data_obj = datetime.strptime(data_hora, '%Y-%m-%d %H:%M:%S')
+
+        timestamp = int(data_obj.timestamp() * 1_000_000_000)
+        return timestamp
+
+    def __realizar_tratamento_valores(self, dados: Dict, chave: str):
+        return float(
+            dados[chave]) if dados[chave] is not None else 0.0
+
     def gerar_mensagens(self):
         for dados in self.__kafka_consumer.consumidor_mensagens():
             escrever_api = self.__cliente.write_api(write_options=SYNCHRONOUS)
 
             print('=' * 20)
             print(dados)
-            data_hora_atual = parser.parse(
-                dados['data_hora_atual']).replace(tzinfo=None)
 
-            angulo_vento = float(
-                dados['angulo_vento']) if dados['angulo_vento'] is not None else 0.0
+            data_hora_api = self.__converter_data(
+                data_hora=dados['data_hora_api'])
+            probabilidade_chuva = self.__realizar_tratamento_valores(
+                dados=dados,
+                chave='probabilidade_chuva'
+            )
+
+            angulo_vento = self.__realizar_tratamento_valores(
+                dados=dados,
+                chave='angulo_vento'
+            )
+
+            velocidade_vento = self.__realizar_tratamento_valores(
+                dados=dados,
+                chave='velocidade_vento'
+            )
+
+            umidade = self.__realizar_tratamento_valores(
+                dados=dados,
+                chave='umidade'
+            )
+
+            temperatura = self.__realizar_tratamento_valores(
+                dados=dados,
+                chave='temperatura'
+            )
 
             data_point = Point('dados_climaticos') \
                 .tag('cidade', dados['cidade']) \
-                .field('temperatura', round(float(dados['temperatura']), 2)) \
-                .time(data_hora_atual)
+                .field('temperatura', temperatura) \
+                .field('clima', dados['clima']) \
+                .field('icone', dados['icone']) \
+                .field('umidade', umidade) \
+                .field('velocidade_vento', velocidade_vento) \
+                .field('angulo_vento', angulo_vento) \
+                .field('probabilidade_chuva', probabilidade_chuva) \
+                .time(data_hora_api)
 
             try:
                 escrever_api.write(
