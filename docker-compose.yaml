@@ -60,7 +60,7 @@ services:
     ports:
       - "8086:8086"
     volumes:
-      - influxdb_data:/var/lib/influxdb2
+      - ./influxdb_data:/var/lib/influxdb2
       - ./influxdb2-config:/etc/influxdb2
     environment:
       - DOCKER_INFLUXDB_INIT_MODE=setup
@@ -115,7 +115,7 @@ services:
       - GF_SECURITY_ADMIN_PASSWORD=admin
       - TZ=America/Sao_Paulo
     volumes:
-      - grafana_data:/var/lib/grafana
+      - ./grafana_data:/var/lib/grafana
     depends_on:
       kafka-ui:
         condition: service_started

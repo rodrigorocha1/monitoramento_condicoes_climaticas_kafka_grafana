@@ -5,3 +5,4 @@ __pycache__
 grafana_data
 influxdb2-config
 influxdb2-data
+influxdb_data

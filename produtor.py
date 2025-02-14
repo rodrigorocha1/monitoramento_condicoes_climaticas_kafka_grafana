@@ -34,7 +34,7 @@ class Produtor:
 
     def rodar_produtor(self):
         total_particoes = len(self.__cidades)
-        topico = 'tempo_cidades'
+        topico = 'historico_tempo_v2'
         self.__kafka_produtor.criar_topico(
             topico=topico,
             numero_particoes=total_particoes
