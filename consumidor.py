@@ -24,40 +24,40 @@ class Consumidor:
         self.__kafka_consumer = KafkaConsumidorClima(
             bootstrap_servers='kafka:9092',
             group_id='weather_grupo',
-            topico='historico_tempo_v2'
+            topico=os.environ['TOPICO']
         )
+        try:
+            self.__cliente.ping()
+            print("Conectado ao InfluxDB com sucesso!")
+
+        except Exception as e:
+            print(f"Falha na conexão com o InfluxDB: {e}")
 
     def gerar_mensagens(self):
         for dados in self.__kafka_consumer.consumidor_mensagens():
             escrever_api = self.__cliente.write_api(write_options=SYNCHRONOUS)
 
             print('=' * 20)
-            print(f'Partição: {dados["particao"]}')
-            print(f"Cidade: {dados['cidade']}")
-            print(f"Temperatura: {dados['temperatura']}°C")
-            print(f"Data/Hora_api: {dados['data_hora_api']}")
-            print(f"Data/Hora: {dados['data_hora_atual']}")
+            print(dados)
+            data_hora_atual = parser.parse(
+                dados['data_hora_atual']).replace(tzinfo=None)
 
-            data_hora_api = parser.parse(dados['data_hora_api'])
-            data_hora_atual = parser.parse(dados['data_hora_atual'])
+            angulo_vento = float(
+                dados['angulo_vento']) if dados['angulo_vento'] is not None else 0.0
+
             data_point = Point('dados_climaticos') \
                 .tag('cidade', dados['cidade']) \
-                .field('clima', dados['clima']) \
-                .field('icone', dados['icone']) \
-                .field('umidade', dados['umidade']) \
-                .field('velocidade_vento', dados['velocidade_vento']) \
-                .field('angulo_vento', dados['angulo_vento']) \
-                .field('probabilidade_chuva', dados['probabilidade_chuva']) \
                 .field('temperatura', round(float(dados['temperatura']), 2)) \
-                .time(data_hora_api) \
                 .time(data_hora_atual)
 
-            escrever_api.write(
-                bucket=self.__INFLUXDB_BUCKET,
-                record=data_point
-            )
-
-            print('=' * 20)
+            try:
+                escrever_api.write(
+                    bucket=self.__INFLUXDB_BUCKET,
+                    record=data_point
+                )
+                print('Dados gravados no InfluxDB')
+            except Exception as e:
+                print(f'Erro ao gravar no InfluxDB: {e}')
 
 
 if __name__ == '__main__':

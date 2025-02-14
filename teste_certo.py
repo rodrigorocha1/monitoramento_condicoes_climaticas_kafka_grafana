@@ -3,8 +3,6 @@ import influxdb_client
 from influxdb_client.client.write_api import SYNCHRONOUS
 import os
 from dotenv import load_dotenv
-
-# Carregar variáveis de ambiente do arquivo .env
 load_dotenv()
 
 url = os.environ['INFLUXDB_URL']
@@ -12,39 +10,36 @@ token = os.environ['INFLUXDB_TOKEN']
 org = os.environ['INFLUXDB_ORG']
 bucket = os.environ['INFLUXDB_BUCKET']
 
-# Criar o cliente do InfluxDB
 client = influxdb_client.InfluxDBClient(
     url=url,
     token=token,
     org=org
 )
 
-# API de escrita
 write_api = client.write_api(write_options=SYNCHRONOUS)
 
-# Inserir dados
 p = influxdb_client.Point("my_measurement").tag(
     "location", "Prague").field("temperature", 25.3).field('teste_campo', 1)
 write_api.write(bucket=bucket, org=org, record=p)
 
-# API de consulta
-query_api = client.query_api()
 
-# Consulta Flux corrigida
+client = influxdb_client.InfluxDBClient(
+    url=url,
+    token=token,
+    org=org
+)
+
+
+query_api = client.query_api()
 query = f'from(bucket:"{bucket}")\
 |> range(start: -10m)\
 |> filter(fn:(r) => r._measurement == "my_measurement")\
 |> filter(fn:(r) => r.location == "Prague")\
-|> filter(fn:(r) => r._field == "teste_campo" or r._field == "temperature")'
-
-# Executar a consulta
+|> filter(fn:(r) => r._field == "teste_campo")'
 result = query_api.query(org=org, query=query)
-
-# Processar os resultados
 results = []
 for table in result:
     for record in table.records:
         results.append((record.get_field(), record.get_value()))
 
-# Exibir os resultados
 print(results)
