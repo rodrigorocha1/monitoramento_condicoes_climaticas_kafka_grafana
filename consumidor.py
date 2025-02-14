@@ -1,10 +1,21 @@
-import os
+from influxdb_client import InfluxDBClient, Point
+from influxdb_client.client.write_api import SYNCHRONOUS
 from src.servico.kafka_consumidor_clima import KafkaConsumidorClima
 
 
 class Consumidor:
 
     def __init__(self):
+
+        # self.__INFLUXDB_URL = ''
+        # self.__INFLUXDB_TOKEN = ''
+        # self.__INFLUXDB_ORG = ''
+        # self.__INFLUXDB_BUCKET = ''
+        # self.__cliente = InfluxDBClient(
+        #     url=self.__INFLUXDB_URL,
+        #     token=self.__INFLUXDB_TOKEN,
+        #     org=self.__INFLUXDB_ORG
+        # )
 
         self.__kafka_consumer = KafkaConsumidorClima(
             bootstrap_servers='kafka:9092',
