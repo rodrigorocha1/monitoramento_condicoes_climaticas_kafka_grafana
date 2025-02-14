@@ -38,23 +38,24 @@ services:
       - KAFKA_CLUSTERS_0_ZOOKEEPER=zookeeper:2181
       - TZ=America/Sao_Paulo  # Ajuste do fuso horário
 
-  # influxdb:
-  #   image: influxdb:2
-  #   container_name: influxdb
-  #   ports:
-  #     - "8086:8086"
-  #   volumes:
-  #     - ./influxdb2-data:/var/lib/influxdb2
-  #     - ./influxdb2-config:/etc/influxdb2
-  #   environment:
-  #     - DOCKER_INFLUXDB_INIT_MODE=setup
-  #     - DOCKER_INFLUXDB_INIT_USERNAME=rodrigo
-  #     - DOCKER_INFLUXDB_INIT_PASSWORD=123456789
-  #     - DOCKER_INFLUXDB_INIT_ORG=rodr
-  #     - DOCKER_INFLUXDB_INIT_BUCKET=rodr
-  #   depends_on:
-  #     - kafka
-  #     - zookeeper
+  influxdb:
+    image: influxdb:2
+    container_name: influxdb
+    ports:
+      - "8086:8086"
+    volumes:
+      - ./influxdb2-data:/var/lib/influxdb2
+      - ./influxdb2-config:/etc/influxdb2
+    environment:
+      - DOCKER_INFLUXDB_INIT_MODE=setup
+      - DOCKER_INFLUXDB_INIT_USERNAME=rodrigo
+      - DOCKER_INFLUXDB_INIT_PASSWORD=123456789
+      - DOCKER_INFLUXDB_INIT_ORG=rodr
+      - DOCKER_INFLUXDB_INIT_BUCKET=rodr
+    depends_on:
+      - kafka
+      - zookeeper
+      - grafana
 
   producer:
     container_name: produtor
@@ -64,22 +65,22 @@ services:
     depends_on:
       - kafka
       - zookeeper
-      # - influxdb
+      - influxdb
     environment:
       - TZ=America/Sao_Paulo  # Ajuste do fuso horário
 
 
-  # consumer:
-  #   container_name: consumidor
-  #   build:
-  #     context: .
-  #     dockerfile: Dockerfile.consumidor
-  #   depends_on:
-  #     - kafka
-  #     - zookeeper
-  #     # - influxdb
-  #   environment:
-  #     - TZ=America/Sao_Paulo  # Ajuste do fuso horário
+  consumer:
+    container_name: consumidor
+    build:
+      context: .
+      dockerfile: Dockerfile.consumidor
+    depends_on:
+      - kafka
+      - zookeeper
+      - influxdb
+    environment:
+      - TZ=America/Sao_Paulo  # Ajuste do fuso horário
 
 
   grafana:
@@ -98,11 +99,10 @@ services:
     depends_on:
       - kafka-ui
       - zookeeper
-      # - influxdb
 
 
 volumes:
   grafana_data:
     driver: local
-  # influxdb_data:
-  #   driver: local
+  influxdb_data:
+    driver: local

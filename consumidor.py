@@ -5,6 +5,7 @@ from src.servico.kafka_consumidor_clima import KafkaConsumidorClima
 class Consumidor:
 
     def __init__(self):
+
         self.__kafka_consumer = KafkaConsumidorClima(
             bootstrap_servers='172.18.0.3:9092',
             group_id='weather_grupo',

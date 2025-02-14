@@ -2,6 +2,8 @@ import json
 import datetime
 from typing import Any, Dict, Generator
 from kafka import KafkaConsumer
+from kafka.errors import KafkaError
+import time
 
 
 class KafkaConsumidorClima:
@@ -13,14 +15,23 @@ class KafkaConsumidorClima:
             group_id (str): grupo id
             topico (str): tótico a ser consumido
         """
-        self.__consumer = KafkaConsumer(
-            topico,
-            bootstrap_servers=bootstrap_servers,
-            group_id=group_id,
-            value_deserializer=lambda x: json.loads(x.decode('utf-8')),
-            auto_offset_reset='latest',
-            enable_auto_commit=True
-        )
+        for i in range(11):
+            try:
+                self.__consumer = KafkaConsumer(
+                    topico,
+                    bootstrap_servers=bootstrap_servers,
+                    group_id=group_id,
+                    value_deserializer=lambda x: json.loads(x.decode('utf-8')),
+                    auto_offset_reset='latest',
+                    enable_auto_commit=True
+                )
+                break
+            except KafkaError as e:
+                print(f"Tentativa {i + 1}/5 falhou: {e}")
+                time.sleep(5)
+        else:
+            raise RuntimeError(
+                "Falha ao conectar ao Kafka após várias tentativas.")
 
     def consumidor_mensagens(self) -> Generator[Dict[str, Any], None, None]:
         """Método para consumir mensagens

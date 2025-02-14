@@ -10,7 +10,7 @@ load_dotenv()
 class Produtor:
     def __init__(self, servico_tempo: IservicoTempo):
         self.__kafka_produtor = KafkaProdutorClima(
-            bootstrap_servers='kafka:9092'
+            bootstrap_servers='172.18.0.3:9092'
         )
 
         self.__servico_tempo = servico_tempo
@@ -53,7 +53,7 @@ class Produtor:
                     municipio=cidade,
                     particao=particao
                 )
-                sleep(os.environ['TEMPO_ESPERA'])
+            sleep(int(os.environ['TEMPO_ESPERA']))
 
 
 if __name__ == '__main__':

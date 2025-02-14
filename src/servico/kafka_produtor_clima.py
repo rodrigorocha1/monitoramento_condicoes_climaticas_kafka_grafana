@@ -13,7 +13,7 @@ class KafkaProdutorClima:
         Args:
             bootstrap_servers (str): url do kafka
         """
-        for i in range(6):
+        for i in range(11):
             try:
                 self.__produtor = KafkaProducer(
                     bootstrap_servers=bootstrap_servers,
