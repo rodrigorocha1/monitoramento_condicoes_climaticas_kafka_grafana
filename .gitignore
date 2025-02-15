@@ -6,3 +6,15 @@ grafana_data
 influxdb2-config
 influxdb2-data
 influxdb_data
+docs/Slides/1.Introdução/1.1.Apresentação.pdf
+docs/Slides/2.Fundamentos de Aplicações Streming Real Time/1.1.Introdução.pdf
+docs/Slides/2.Fundamentos de Aplicações Streming Real Time/2.1.Componentes.pdf
+docs/Slides/2.Fundamentos de Aplicações Streming Real Time/3.1.Arquitetura .pdf
+docs/Slides/3.Conhecendo o Projeto/1.Apresentação Aurora do Vale.pdf
+docs/Slides/4.Conhecendo a API para Consumo de Dados/1.1.API Consumo de Dados.pdf
+docs/Slides/4.Conhecendo a API para Consumo de Dados/2.1.Dados disponpiveis na API.pdf
+docs/Slides/5.Estudando a Arquiteturas Propostas e Ferramentas/2.1.Ferramentas.pdf
+docs/Slides/5.Estudando a Arquiteturas Propostas e Ferramentas/3.1.Arquitetura proposta.pdf
+docs/Slides/6.Configurando o Ambiente/1.Ambiente Usado.pdf
+docs/Slides/6.Configurando o Ambiente/2.Considerações sobre custos.pdf
+docs/.~lock.requisitos.odt#
