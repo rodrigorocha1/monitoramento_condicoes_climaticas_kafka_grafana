@@ -28,7 +28,7 @@ class Consumidor:
         )
 
         self.__kafka_consumer = KafkaConsumidorClima(
-            bootstrap_servers='kafka:9092',
+            bootstrap_servers='172.20.0.4:9092',
             group_id='weather_grupo',
             topico=os.environ['TOPICO']
         )
