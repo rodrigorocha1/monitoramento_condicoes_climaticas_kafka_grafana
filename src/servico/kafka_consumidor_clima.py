@@ -28,7 +28,7 @@ class KafkaConsumidorClima:
                 break
             except KafkaError as e:
                 print(f"Tentativa {i + 1}/5 falhou: {e}")
-                time.sleep(5)
+                time.sleep(30)
         else:
             raise RuntimeError(
                 "Falha ao conectar ao Kafka após várias tentativas.")
