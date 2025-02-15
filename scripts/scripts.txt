@@ -2,4 +2,12 @@ from(bucket: "rodr")
   |> range(start: -30d)  // Ajuste conforme necessário
   |> filter(fn: (r) => r._measurement == "dados_climaticos")
   |> filter(fn: (r) => r.cidade == "Ribeirão Preto")
-  |> filter(fn: (r) => r._field == "temperatura")
+  |> filter(fn: (r) => r._field == "umidade")
+
+
+
+from(bucket: "rodr")
+  |> range(start: -30d)
+  |> filter(fn: (r) => r._measurement == "dados_climaticos")
+  |> filter(fn: (r) => r.cidade == "${cidade}")
+  |> filter(fn: (r) => r._field == "umidade")
