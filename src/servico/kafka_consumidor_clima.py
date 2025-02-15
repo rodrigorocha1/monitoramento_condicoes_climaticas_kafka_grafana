@@ -56,6 +56,7 @@ class KafkaConsumidorClima:
                 particao = mensagem.partition
                 offset = mensagem.offset
                 icone = mensagem.value["weather"][0]["icon"]
+                pressao_atmosferica = mensagem.value['main']['pressure']
                 yield {
                     'particao': particao,
                     'cidade': cidade,
@@ -69,7 +70,8 @@ class KafkaConsumidorClima:
 
                     'velocidade_vento': velocidade_vento,
                     'angulo_vento': angulo_vento,
-                    'probabilidade_chuva': probabilidade_chuva
+                    'probabilidade_chuva': probabilidade_chuva,
+                    'pressao_atmosferica': pressao_atmosferica
 
                 }
 
