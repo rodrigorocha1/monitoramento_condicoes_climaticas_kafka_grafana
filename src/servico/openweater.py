@@ -25,7 +25,7 @@ class OpenWeater(IservicoTempo):
             'appid': self.__chave,
             'units': 'metric',
             'lang': 'pt_br',
-            'q': cidade
+            'q': f'{cidade}, Br'
         }
         response = requests.get(
             url=self.__url + 'weather',
