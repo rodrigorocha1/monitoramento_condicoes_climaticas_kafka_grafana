@@ -1,5 +1,5 @@
 import json
-import datetime
+from datetime import datetime
 from typing import Any, Dict, Generator
 from kafka import KafkaConsumer
 from kafka.errors import KafkaError
@@ -43,20 +43,27 @@ class KafkaConsumidorClima:
         try:
             for mensagem in self.__consumer:
                 cidade = mensagem.value["name"]
-                data_hora = datetime.datetime.fromtimestamp(
+                data_hora = datetime.fromtimestamp(
                     mensagem.value["dt"]).strftime('%Y-%m-%d %H:%M:%S')
                 temperatura = mensagem.value["main"]["temp"]
                 velocidade_vento = mensagem.value["wind"]["speed"]
                 umidade = mensagem.value["main"]["humidity"]
                 angulo_vento = mensagem.value["wind"]["deg"]
                 probabilidade_chuva = mensagem.value["clouds"]["all"]
-                data_hora_atual = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+                data_hora_atual = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
                 chave = mensagem.key
                 clima = mensagem.value["weather"][0]["description"]
                 particao = mensagem.partition
                 offset = mensagem.offset
                 icone = mensagem.value["weather"][0]["icon"]
                 pressao_atmosferica = mensagem.value['main']['pressure']
+                data_hora_nascer_sol = datetime.fromtimestamp(
+                    mensagem.value['sys']['sunrise']).strftime('%d/%m/%Y %H:%M:%S')
+
+                data_hora_por_sol = datetime.fromtimestamp(
+                    mensagem.value['sys']['sunset']).strftime('%d/%m/%Y %H:%M:%S')
+
+                visibilidade = mensagem.value['visibility']
                 yield {
                     'particao': particao,
                     'cidade': cidade,
@@ -71,9 +78,12 @@ class KafkaConsumidorClima:
                     'velocidade_vento': velocidade_vento,
                     'angulo_vento': angulo_vento,
                     'probabilidade_chuva': probabilidade_chuva,
-                    'pressao_atmosferica': pressao_atmosferica
+                    'pressao_atmosferica': pressao_atmosferica,
+                    'data_hora_nascer_sol': data_hora_nascer_sol,
+                    'data_hora_por_sol': data_hora_por_sol,
+                    'visibilidade': visibilidade
 
                 }
 
-        except:
-            print(f'Erro No municipio {mensagem.value}')
+        except Exception as e:
+            print(f'Erro No municipio {mensagem.value} - {e}')

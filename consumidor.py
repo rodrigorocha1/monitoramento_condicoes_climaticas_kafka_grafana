@@ -92,6 +92,10 @@ class Consumidor:
                 .field('velocidade_vento', velocidade_vento) \
                 .field('angulo_vento', angulo_vento) \
                 .field('probabilidade_chuva', probabilidade_chuva) \
+                .field('pressao_atmosferica', dados['pressao_atmosferica']) \
+                .field('data_hora_nascer_sol', dados['data_hora_nascer_sol']) \
+                .field('data_hora_por_sol', dados['data_hora_por_sol']) \
+                .field('visibilidade', dados['visibilidade']) \
                 .time(data_hora_api)
 
             try:
