@@ -9,5 +9,87 @@ from(bucket: "rodr")
 from(bucket: "rodr")
   |> range(start: -30d)
   |> filter(fn: (r) => r._measurement == "dados_climaticos")
-  |> filter(fn: (r) => r.cidade == "${cidade}")
-  |> filter(fn: (r) => r._field == "umidade")
+  |> filter(fn: (r) => r.cidade == "${municipio}")
+  |> filter(fn: (r) => r._field == "probabilidade_chuva")
+
+
+
+  from(bucket: "rodr")
+  |> range(start: -30d)
+  |> filter(fn: (r) => r._measurement == "dados_climaticos")
+  |> filter(fn: (r) => r.cidade == "Ribeirão Preto")
+  |> filter(fn: (r) => r._field == "probabilidade_chuva")
+  |> map(fn: (r) => ({
+      r with
+      categoria_chuva:
+        if r._value >= 80 then "Alta"
+        else if r._value >= 50 then "Média"
+        else if r._value >= 20 then "Baixa"
+        else "Muito Baixa"
+  }))
+
+
+from(bucket: "rodr")
+  |> range(start: -30d)
+  |> filter(fn: (r) => r._measurement == "dados_climaticos")
+  |> filter(fn: (r) => r.cidade == "${municipio}")
+  |> filter(fn: (r) => r._field == "clima")
+  |> sort(columns: ["_time"], desc: false)
+  |> first()
+
+
+
+from(bucket: "rodr")
+  |> range(start: -30d)
+  |> filter(fn: (r) => r._measurement == "dados_climaticos")
+  |> filter(fn: (r) => r.cidade == "${municipio}")
+  |> filter(fn: (r) => r._field == "icone")
+  |> sort(columns: ["_time"], desc: true)
+  |> first()
+
+
+
+from(bucket: "rodr")
+  |> range(start: -30d)
+  |> filter(fn: (r) => r._measurement == "dados_climaticos")
+  |> filter(fn: (r) => r.cidade == "Ribeirão Preto")
+  |> filter(fn: (r) => r._field == "angulo_vento")
+  |> sort(columns: ["_time"], desc: true)
+  |> first()
+  |> map(fn: (r) => ({
+      r with direcao_vento:
+        if r._value >= 0 and r._value < 22.5 then "Norte"
+        else if r._value >= 22.5 and r._value < 67.5 then "Nordeste"
+        else if r._value >= 67.5 and r._value < 112.5 then "Leste"
+        else if r._value >= 112.5 and r._value < 157.5 then "Sudeste"
+        else if r._value >= 157.5 and r._value < 202.5 then "Sul"
+        else if r._value >= 202.5 and r._value < 247.5 then "Sudoeste"
+        else if r._value >= 247.5 and r._value < 292.5 then "Oeste"
+        else if r._value >= 292.5 and r._value < 337.5 then "Noroeste"
+        else "Norte"
+  }))
+
+
+
+from(bucket: "rodr")
+  |> range(start: -30d)
+  |> filter(fn: (r) => r._measurement == "dados_climaticos")
+  |> filter(fn: (r) => r.cidade == "Ribeirão Preto")
+  |> filter(fn: (r) => r._field == "velocidade_vento")
+  |> sort(columns: ["_time"], desc: true)
+  |> map(fn: (r) => ({
+      r with 
+      escala_beaufort: 
+        if r._value >= 0 and r._value <= 1 then "Calmaria"
+        else if r._value > 1 and r._value <= 5 then "Brisa leve"
+        else if r._value > 5 and r._value <= 11 then "Brisa moderada"
+        else if r._value > 11 and r._value <= 19 then "Brisa fresca"
+        else if r._value > 19 and r._value <= 28 then "Vento forte"
+        else if r._value > 28 and r._value <= 38 then "Vento muito forte"
+        else if r._value > 38 and r._value <= 49 then "Tempestade"
+        else if r._value > 49 and r._value <= 61 then "Tempestade severa"
+        else if r._value > 61 and r._value <= 74 then "Tempestade violenta"
+        else if r._value > 74 and r._value <= 88 then "Furacão"
+        else if r._value > 88 then "Furacão muito forte"
+        else "Desconhecido"
+  }))

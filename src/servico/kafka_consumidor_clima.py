@@ -72,7 +72,7 @@ class KafkaConsumidorClima:
 
                     'data_hora_atual': data_hora_atual,
                     'clima': clima,
-                    'icone': icone,
+                    'icone': f'https://openweathermap.org/img/wn/{icone}.png',
                     'umidade': umidade,
 
                     'velocidade_vento': velocidade_vento,
