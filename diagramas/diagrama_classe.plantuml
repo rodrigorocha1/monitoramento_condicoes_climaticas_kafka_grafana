@@ -1,0 +1,70 @@
+@startuml
+
+ package raiz {
+
+    package src {
+        package servico {
+            interface IservicoTempo {
+                +obter_tempo_atual(cidade: str): Dict[str, Any>]
+
+             } 
+
+            class OpenWeater implements IservicoTempo {
+                 - url : str
+                 - chave : str
+             }
+
+            class KafkaProdutorClima {
+                - produtor : KafkaProducer
+                - admin_cliente : KafkaAdminClient
+                + KafkaProdutorClima(bootstrap_servers: str)
+                + criar_topico(topico: str, numero_particoes: int) : None
+                + verificar_particoes(topico: str) : int
+                + enviar_dados_clima(topico: str, municipio: str, dados_climaticos: Dict, particao: int)
+            }
+            class KafkaConsumidorClima {
+            - consumer : KafkaConsumer
+            + bootstrap_servers: str
+            + group_id: str
+            + topico : str
+            
+            + consumidor_mensagens() : Generator[Dict[str, Any], None, None]
+            }
+
+                KafkaConsumidorClima *-- KafkaConsumer
+                KafkaProdutorClima *-- KafkaProducer
+                KafkaProdutorClima *-- KafkaAdminClient
+        }
+    }
+
+
+    class Produtor {
+        - kafka_produtor: KafkaProdutorClima
+        - servico_tempo : IservicoTempo
+        - cidades: List[str]
+        + rodar_produtor()
+
+
+    }
+
+    class Consumidor {
+        - INFLUXDB_URL : str
+        - INFLUXDB_TOKEK: str
+        - INFLUXDB_ORG: str
+        - INFLUXDB_BUCKET: str
+        - cliente: InfluxDBClient
+        - kafka_consumer : KafkaConsumidorClima
+
+        - converter_data( data_hora: str): int
+        - realizar_tratamento_valore(dados: Dict, chave: str) : Float
+        + gerar_mensagens()
+    }
+
+    Produtor *-- KafkaProdutorClima
+    Produtor *-- IservicoTempo
+    Consumidor *-- InfluxDBClient
+    Consumidor*-- KafkaConsumidorClima
+
+ }
+
+@enduml
